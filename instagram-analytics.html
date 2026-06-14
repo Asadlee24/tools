@@ -9,10 +9,10 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts: Playfair Display + Inter -->
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,8 +27,8 @@
       theme: {
         extend: {
           fontFamily: {
-            serif: ['"Playfair Display"', 'serif'],
-            sans: ['Inter', 'sans-serif'],
+            serif: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
           },
           colors: {
             bg: 'var(--bg)',
@@ -48,27 +48,27 @@
 
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #f8f8f6;
-      --border: #e8e4dc;
-      --text: #1a1a1a;
-      --text-muted: #6b6560;
-      --gold: #c8922a;
-      --gold-light: #f0e4c8;
-      --accent: #1a1a1a;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #dbdbdb;
+      --text: #000000;
+      --text-muted: #737373;
+      --gold: #e1306c;
+      --gold-light: #fdf2f8;
+      --accent: #000000;
       --card-bg: #ffffff;
     }
 
     .dark {
-      --bg: #0f0f0e;
-      --surface: #171716;
-      --border: #2e2c29;
-      --text: #f3f3f0;
-      --text-muted: #a39f9a;
-      --gold: #dfaa43;
-      --gold-light: #3e331c;
-      --accent: #f3f3f0;
-      --card-bg: #141413;
+      --bg: #000000;
+      --surface: #121212;
+      --border: #262626;
+      --text: #f5f5f5;
+      --text-muted: #a8a8a8;
+      --gold: #db2777;
+      --gold-light: #25121a;
+      --accent: #f5f5f5;
+      --card-bg: #121212;
     }
 
     body {
@@ -83,21 +83,21 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .premium-card:hover {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transform: translateY(-1px);
     }
 
     .dark .premium-card {
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     .dark .premium-card:hover {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     /* Custom Hide Scrollbar */
@@ -158,8 +158,8 @@
   <!-- Header / Navigation -->
   <header class="border-b border-border py-4 px-6 md:px-12 flex justify-between items-center bg-card-bg transition-colors duration-300">
     <div class="flex items-center gap-3">
-      <span class="text-gold text-2xl font-serif italic font-bold">InstaPulse</span>
-      <span class="hidden md:inline-block px-2.5 py-1 text-xs font-semibold rounded-full border border-gold/30 text-gold bg-gold/10">AI Analytics</span>
+      <span class="text-2xl font-extrabold tracking-tighter bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">InstaPulse</span>
+      <span class="hidden md:inline-block px-2.5 py-1 text-xs font-semibold rounded-full border border-gold/30 text-gold bg-gold/5">AI Analytics</span>
     </div>
     
     <div class="flex items-center gap-4">
@@ -204,20 +204,20 @@
     
     <!-- HERO SECTION -->
     <section id="hero" class="text-center mb-16 max-w-2xl mx-auto transition-all duration-300">
-      <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 leading-tight">
-        Instagram Analytics <br><span class="italic text-gold">Powered by AI Insights</span>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 leading-tight">
+        Instagram Analytics <br><span class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">Powered by AI Insights</span>
       </h1>
       <p class="text-text-muted text-lg mb-8 font-sans max-w-md mx-auto">
         Analyze public Instagram profiles instantly. Track engagement, top posts, niche details, and generate growth insights.
       </p>
 
       <!-- Search Controls -->
-      <div class="flex flex-col sm:flex-row gap-3 p-2 border border-border bg-card-bg rounded-2xl shadow-md max-w-lg mx-auto mb-4 focus-within:border-gold/60 transition-all duration-300">
+      <div class="flex flex-col sm:flex-row gap-3 p-2 border border-border bg-card-bg rounded-2xl shadow-md max-w-lg mx-auto mb-4 focus-within:border-rose-500/50 transition-all duration-300">
         <div class="relative flex-grow flex items-center pl-3">
           <i class="fa-brands fa-instagram text-text-muted text-xl mr-2"></i>
           <input type="text" id="username-input" class="w-full py-2 bg-transparent text-text font-medium placeholder-text-muted focus:outline-none" placeholder="Enter Instagram username..." value="">
         </div>
-        <button id="analyze-btn" class="px-6 py-3 bg-gold hover:bg-gold/90 text-white rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 shadow-sm shadow-gold/20">
+        <button id="analyze-btn" class="px-6 py-3 bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 hover:opacity-95 text-white rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 shadow-sm shadow-rose-500/20">
           <i class="fa-solid fa-magnifying-glass"></i> Analyze
         </button>
       </div>
@@ -1007,22 +1007,31 @@
       // Render circular SVG gauge
       elements.qualityScoreCard.innerHTML = `
         <div class="flex flex-col items-center">
-          <h3 class="font-serif text-xl font-bold mb-6">Profile Quality Score</h3>
+          <h3 class="text-lg font-bold mb-6 text-text">Profile Quality Score</h3>
           <div class="relative flex items-center justify-center w-32 h-32">
             <svg class="w-full h-full transform -rotate-90">
+              <defs>
+                <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f09433" />
+                  <stop offset="30%" stop-color="#e6683c" />
+                  <stop offset="60%" stop-color="#dc2743" />
+                  <stop offset="85%" stop-color="#cc2366" />
+                  <stop offset="100%" stop-color="#bc1888" />
+                </linearGradient>
+              </defs>
               <circle cx="64" cy="64" r="54" stroke="var(--border)" stroke-width="8" fill="transparent" />
-              <circle cx="64" cy="64" r="54" stroke="var(--gold)" stroke-width="8" fill="transparent"
+              <circle cx="64" cy="64" r="54" stroke="url(#scoreGrad)" stroke-width="8" fill="transparent"
                 stroke-dasharray="339.3"
                 stroke-dashoffset="${339.3 - (finalScore / 100) * 339.3}"
                 class="transition-all duration-1000 ease-out" />
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <span class="text-3xl font-bold font-serif text-text">${finalScore}</span>
-              <span class="text-[10px] uppercase tracking-wider text-text-muted">grade</span>
+              <span class="text-3xl font-extrabold text-text">${finalScore}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">grade</span>
             </div>
           </div>
-          <div class="mt-4 text-sm text-text-muted">
-            Based on engagement, consistency, bio analysis, and user ratio.
+          <div class="mt-4 text-xs text-text-muted text-center">
+            Based on engagement, consistency, bio completeness, and follower ratio.
           </div>
         </div>
       `;
@@ -1032,12 +1041,15 @@
     function renderProfile(profile) {
       elements.profileOverview.innerHTML = `
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-border">
-          <img src="${profile.profilePic}" alt="${profile.fullName}" class="w-20 h-20 rounded-full object-cover border-2 border-gold/40 p-0.5">
-          <div class="text-center sm:text-left flex-grow space-y-2">
+          <div class="relative w-20 h-20 flex-shrink-0">
+            <img src="${profile.profilePic}" alt="${profile.fullName}" class="w-20 h-20 rounded-full object-cover p-1 bg-bg border-4 border-bg relative z-10" onerror="this.src='https://via.placeholder.com/150'">
+            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600"></div>
+          </div>
+          <div class="text-center sm:text-left flex-grow space-y-2 pt-1">
             <div class="flex flex-wrap justify-center sm:justify-start items-center gap-2">
-              <h2 class="font-serif text-2xl font-bold text-text">${profile.fullName}</h2>
+              <h2 class="text-2xl font-bold tracking-tight text-text">${profile.fullName || profile.username}</h2>
               <span class="text-text-muted text-sm font-medium">@${profile.username}</span>
-              ${profile.isVerified ? '<span class="text-blue-500" title="Verified Account"><i class="fa-solid fa-circle-check text-base"></i></span>' : ''}
+              ${profile.isVerified ? '<span class="text-sky-500" title="Verified Account"><i class="fa-solid fa-circle-check text-base"></i></span>' : ''}
             </div>
             
             <div class="flex flex-wrap justify-center sm:justify-start gap-2 pt-1">
@@ -1452,8 +1464,8 @@
             {
               label: 'Likes',
               data: last12.map(p => p.likes),
-              borderColor: '#c8922a',
-              backgroundColor: 'rgba(200, 146, 42, 0.1)',
+              borderColor: '#e1306c',
+              backgroundColor: 'rgba(225, 48, 108, 0.1)',
               borderWidth: 2,
               tension: 0.4,
               fill: true,
@@ -1510,7 +1522,7 @@
           datasets: [{
             label: 'Frequency',
             data: hsData,
-            backgroundColor: '#c8922a',
+            backgroundColor: '#e1306c',
             borderRadius: 4,
             barThickness: 12
           }]
