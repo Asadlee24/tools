@@ -243,6 +243,14 @@
     <!-- MAIN DASHBOARD CONTENT (Hidden until query) -->
     <div id="results" class="hidden space-y-8 animate-fade-in">
       
+      <!-- Simulation / Rate Limit Notice Banner -->
+      <div id="rate-limit-banner" class="hidden p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-500 text-xs font-semibold flex items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation text-base"></i>
+        <div class="flex-grow">
+          <span>Notice: Showing simulated data because the RapidAPI key has reached its rate limit (429). Please add your own API Key in settings (top-right) for live real-time analysis.</span>
+        </div>
+      </div>
+      
       <!-- Actions Bar (Share Report) -->
       <div class="flex justify-between items-center py-2 border-b border-border">
         <span class="text-xs text-text-muted">Report generated for <span id="report-handle" class="font-semibold text-text">@username</span></span>
@@ -607,6 +615,9 @@
         showNotification('⚠️ RapidAPI limit reached (429). Loaded simulated dashboard for @' + username);
         return;
       }
+
+      // Hide rate limit banner if the api actually succeeds
+      document.getElementById('rate-limit-banner')?.classList.add('hidden');
 
       // Handle Profile Data
       if (profileRes.status === 'fulfilled' && profileRes.value) {
@@ -2029,6 +2040,16 @@ Generated via InstaPulse Dashboard.
       
       elements.statusFeedback.classList.add('hidden');
       elements.resultsDiv.classList.remove('hidden');
+
+      // Show rate limit alert banner if it's an automatic fallback simulation, hide it for design_maven demo
+      const banner = document.getElementById('rate-limit-banner');
+      if (banner) {
+        if (username !== 'design_maven') {
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
 
       // Mock Insights Generator
       const mockInsights = generateMockAIInsights(compiled);
