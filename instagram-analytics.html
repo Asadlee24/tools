@@ -161,44 +161,14 @@
       <span class="text-2xl font-extrabold tracking-tighter bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent">InstaPulse</span>
       <span class="hidden md:inline-block px-2.5 py-1 text-xs font-semibold rounded-full border border-gold/30 text-gold bg-gold/5">AI Analytics</span>
     </div>
-    
     <div class="flex items-center gap-4">
-      <!-- Mode & Config Controls -->
-      <button id="config-toggle-btn" class="p-2.5 rounded-full hover:bg-surface text-text-muted hover:text-text transition-colors" title="API Configuration">
-        <i class="fa-solid fa-sliders text-lg"></i>
-      </button>
+      <!-- Mode Controls -->
       <button id="dark-mode-toggle" class="p-2.5 rounded-full hover:bg-surface text-text-muted hover:text-text transition-colors" title="Toggle Theme">
         <i class="fa-solid fa-moon text-lg dark:hidden"></i>
         <i class="fa-solid fa-sun text-lg hidden dark:block"></i>
       </button>
     </div>
   </header>
-
-  <!-- API Config Panel (Collapsible) -->
-  <div id="config-panel" class="hidden border-b border-border bg-surface/50 p-6 px-6 md:px-12 transition-all duration-300">
-    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h4 class="text-sm font-semibold mb-2 flex items-center gap-2">
-          <i class="fa-brands fa-instagram text-gold"></i> Instagram Data19 RapidAPI Key
-        </h4>
-        <input type="password" id="rapidapi-key-input" class="w-full px-4 py-2 border border-border bg-card-bg rounded-lg text-sm text-text focus:outline-none focus:border-gold transition-colors" placeholder="Enter RapidAPI Key" value="c5373eb158msha205deb7dcf7facp1e9c1fjsnf1956ad024a2">
-        <p class="text-xs text-text-muted mt-1">Provided default key is pre-filled.</p>
-      </div>
-      <div>
-        <h4 class="text-sm font-semibold mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-brain text-gold"></i> Claude API Key
-        </h4>
-        <input type="password" id="claude-key-input" class="w-full px-4 py-2 border border-border bg-card-bg rounded-lg text-sm text-text focus:outline-none focus:border-gold transition-colors" placeholder="Enter Anthropic API Key (sk-ant-...)">
-        <p class="text-xs text-text-muted mt-1">Saved in your local browser storage. Leave empty to use Mock AI simulation.</p>
-      </div>
-    </div>
-    <div class="max-w-4xl mx-auto flex justify-between items-center mt-4 pt-4 border-t border-border/60">
-      <span class="text-xs text-text-muted">Direct browser Anthropic requests use <code>anthropic-dangerous-direct-browser-access</code>.</span>
-      <button id="save-config-btn" class="px-4 py-1.5 bg-accent hover:bg-accent/80 text-white rounded-lg text-xs font-semibold tracking-wide transition-colors">
-        Save Configuration
-      </button>
-    </div>
-  </div>
 
   <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
     
@@ -380,8 +350,8 @@
     // GLOBAL STATE MANAGEMENT
     const STATE = {
       theme: localStorage.getItem('theme') || 'light',
-      rapidApiKey: localStorage.getItem('rapid_api_key') || 'c5373eb158msha205deb7dcf7facp1e9c1fjsnf1956ad024a2',
-      claudeApiKey: localStorage.getItem('claude_api_key') || '',
+      rapidApiKey: 'c5373eb158msha205deb7dcf7facp1e9c1fjsnf1956ad024a2',
+      claudeApiKey: '',
       currentUsername: '',
       isDemoMode: false,
       data: {
@@ -404,11 +374,6 @@
     // UI ELEMENTS
     const elements = {
       darkModeToggle: document.getElementById('dark-mode-toggle'),
-      configToggleBtn: document.getElementById('config-toggle-btn'),
-      configPanel: document.getElementById('config-panel'),
-      rapidApiKeyInput: document.getElementById('rapidapi-key-input'),
-      claudeKeyInput: document.getElementById('claude-key-input'),
-      saveConfigBtn: document.getElementById('save-config-btn'),
       usernameInput: document.getElementById('username-input'),
       analyzeBtn: document.getElementById('analyze-btn'),
       demoBtn: document.getElementById('demo-btn'),
@@ -469,8 +434,6 @@
       } else {
         document.documentElement.classList.remove('dark');
       }
-      elements.claudeKeyInput.value = STATE.claudeApiKey;
-      elements.rapidApiKeyInput.value = STATE.rapidApiKey;
     }
 
     // TOGGLES & HANDLERS
@@ -482,19 +445,6 @@
       if (STATE.data.compiled) {
         renderCharts(STATE.data.compiled);
       }
-    });
-
-    elements.configToggleBtn.addEventListener('click', () => {
-      elements.configPanel.classList.toggle('hidden');
-    });
-
-    elements.saveConfigBtn.addEventListener('click', () => {
-      STATE.rapidApiKey = elements.rapidApiKeyInput.value.trim();
-      STATE.claudeApiKey = elements.claudeKeyInput.value.trim();
-      localStorage.setItem('rapid_api_key', STATE.rapidApiKey);
-      localStorage.setItem('claude_api_key', STATE.claudeApiKey);
-      elements.configPanel.classList.add('hidden');
-      showNotification('Configuration Saved Successfully');
     });
 
     // TOAST NOTIFICATIONS
