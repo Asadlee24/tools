@@ -586,12 +586,12 @@
       // Parallel fetches using Promise.allSettled
       const [profileRes, postsRes, reelsRes, storiesRes, highlightsRes, taggedRes] =
         await Promise.allSettled([
-          fetchInstagram('user/info', username),
-          fetchInstagram('user/posts-reels', username),
-          fetchInstagram('user/reels', username),
-          fetchInstagram('user/stories', username),
-          fetchInstagram('user/highlights', username),
-          fetchInstagram('user/tagged', username),
+          fetchInstagram('user-info', username),
+          fetchInstagram('user-posts-reels', username),
+          fetchInstagram('user-reels', username),
+          fetchInstagram('user-stories', username),
+          fetchInstagram('user-highlights', username),
+          fetchInstagram('user-tag', username),
         ]);
 
       elements.reportHandle.innerText = `@${username}`;
