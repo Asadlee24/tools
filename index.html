@@ -544,126 +544,57 @@
       STATE.isDemoMode = false;
       showLoadingState();
 
-      // Parallel fetches using Promise.allSettled
-      const [profileRes, postsRes, reelsRes, storiesRes, highlightsRes, taggedRes] =
-        await Promise.allSettled([
-          fetchInstagram('user-info', username),
-          fetchInstagram('user-posts-reels', username),
-          fetchInstagram('user-reels', username),
-          fetchInstagram('user-stories', username),
-          fetchInstagram('user-highlights', username),
-          fetchInstagram('user-tag', username),
+      try {
+        // Step 1: Get User ID by username
+        const idData = await fetchInstagram('user_id_by_username', { username });
+        const userId = idData.UserID;
+        if (!userId) {
+          throw new Error('User ID not found for @' + username);
+        }
+
+        // Step 2: Fetch Profile and Feed in parallel
+        const [profileRes, feedRes] = await Promise.allSettled([
+          fetchInstagram('profile', { username }),
+          fetchInstagram('feed', { user_id: userId })
         ]);
 
-      elements.reportHandle.innerText = `@${username}`;
+        elements.reportHandle.innerText = `@${username}`;
 
-      // Check if critical fetches failed (e.g., due to RapidAPI 429 Rate Limit or network errors)
-      const hasCriticalFailed = profileRes.status === 'rejected' || postsRes.status === 'rejected';
-      if (hasCriticalFailed) {
-        let apiErrorMsg = 'RapidAPI limit reached (429) or endpoint not responding.';
-        if (profileRes.status === 'rejected' && profileRes.reason?.message) {
-          apiErrorMsg = profileRes.reason.message;
-        } else if (postsRes.status === 'rejected' && postsRes.reason?.message) {
-          apiErrorMsg = postsRes.reason.message;
+        // Check if critical fetches failed
+        const hasCriticalFailed = profileRes.status === 'rejected' || feedRes.status === 'rejected';
+        if (hasCriticalFailed) {
+          let apiErrorMsg = 'RapidAPI limit reached or endpoint not responding.';
+          if (profileRes.status === 'rejected' && profileRes.reason?.message) {
+            apiErrorMsg = profileRes.reason.message;
+          } else if (feedRes.status === 'rejected' && feedRes.reason?.message) {
+            apiErrorMsg = feedRes.reason.message;
+          }
+          throw new Error(apiErrorMsg);
         }
-        console.warn('API critical error encountered:', apiErrorMsg);
+
+        // Hide rate limit banner if the api actually succeeds
+        document.getElementById('rate-limit-banner')?.classList.add('hidden');
+
+        // Parse profile
+        STATE.data.profile = parseProfile(profileRes.value);
+        renderProfile(STATE.data.profile);
+
+        // Parse all items from feed
+        const allItems = parsePosts(feedRes.value);
         
-        // Hide spinner and display clean, descriptive API error state
-        elements.statusSpinner.classList.add('hidden');
-        elements.statusText.innerHTML = `
-          <div class="text-rose-500 font-semibold flex flex-col items-center gap-3 py-6">
-            <i class="fa-solid fa-circle-exclamation text-3xl animate-bounce"></i>
-            <span class="text-base text-center max-w-md">API Key Error: ${apiErrorMsg}</span>
-            <span class="text-xs text-text-muted font-normal text-center max-w-sm mt-1">
-              The RapidAPI Monthly Quota is exhausted. Please replace the key in the code (Line 353) to see your real profile statistics.
-            </span>
-          </div>
-        `;
-        
-        // Hide results container if previously shown
-        elements.resultsDiv.classList.add('hidden');
-        showNotification('⚠️ ' + apiErrorMsg);
-        return;
-      }
+        // Filter into posts and reels
+        STATE.data.posts = allItems.filter(item => item.type !== 'Reel');
+        STATE.data.reels = allItems.filter(item => item.type === 'Reel');
+        STATE.data.stories = [];
+        STATE.data.highlights = [];
+        STATE.data.tagged = [];
 
-      // Hide rate limit banner if the api actually succeeds
-      document.getElementById('rate-limit-banner')?.classList.add('hidden');
+        // Render sections that don't need compilation
+        renderReels(STATE.data.reels);
+        renderStoriesHighlights(0, []);
+        renderTagged([]);
 
-      // Handle Profile Data
-      if (profileRes.status === 'fulfilled' && profileRes.value) {
-        try {
-          STATE.data.profile = parseProfile(profileRes.value);
-          renderProfile(STATE.data.profile);
-        } catch (e) {
-          console.error(e);
-          showSectionError('profile-overview', 'Failed parsing profile data');
-        }
-      } else {
-        showSectionError('profile-overview', profileRes.reason?.message || 'Profile API failed');
-      }
-
-      // Handle Posts Data
-      if (postsRes.status === 'fulfilled' && postsRes.value) {
-        try {
-          STATE.data.posts = parsePosts(postsRes.value);
-        } catch (e) {
-          console.error(e);
-          showSectionError('top-posts-container', 'Failed parsing posts data');
-        }
-      } else {
-        showSectionError('top-posts-container', postsRes.reason?.message || 'Posts API failed');
-      }
-
-      // Handle Reels Data
-      if (reelsRes.status === 'fulfilled' && reelsRes.value) {
-        try {
-          STATE.data.reels = parseReels(reelsRes.value);
-          renderReels(STATE.data.reels);
-        } catch (e) {
-          console.error(e);
-          showSectionError('reels-analytics', 'Failed parsing Reels data');
-        }
-      } else {
-        showSectionError('reels-analytics', reelsRes.reason?.message || 'Reels API failed');
-      }
-
-      // Handle Stories Data & Highlights
-      let activeStories = 0;
-      let highlightsList = [];
-
-      if (storiesRes.status === 'fulfilled' && storiesRes.value) {
-        try {
-          activeStories = parseStoriesCount(storiesRes.value);
-        } catch (e) { console.error('Stories error:', e); }
-      }
-      
-      if (highlightsRes.status === 'fulfilled' && highlightsRes.value) {
-        try {
-          highlightsList = parseHighlights(highlightsRes.value);
-        } catch (e) { console.error('Highlights error:', e); }
-      }
-
-      if (storiesRes.status === 'rejected' && highlightsRes.status === 'rejected') {
-        showSectionError('stories-highlights', 'Stories & Highlights API failed');
-      } else {
-        renderStoriesHighlights(activeStories, highlightsList);
-      }
-
-      // Handle Tagged Data
-      if (taggedRes.status === 'fulfilled' && taggedRes.value) {
-        try {
-          STATE.data.tagged = parseTagged(taggedRes.value);
-          renderTagged(STATE.data.tagged);
-        } catch (e) {
-          console.error(e);
-          showSectionError('similar-accounts-card', 'Failed parsing Tagged Accounts');
-        }
-      } else {
-        showSectionError('similar-accounts-card', taggedRes.reason?.message || 'Tagged API failed');
-      }
-
-      // Compile, score, and finalize charts + AI
-      try {
+        // Compile, score, and finalize charts + AI
         if (STATE.data.profile && STATE.data.posts) {
           const compiled = compileAnalytics();
           STATE.data.compiled = compiled;
@@ -677,6 +608,7 @@
           calculateQualityScore(compiled);
           
           elements.statusFeedback.classList.add('hidden');
+          elements.resultsDiv.classList.remove('hidden');
           
           // AI Insights invocation
           await runAIInsights(compiled);
@@ -684,24 +616,40 @@
           elements.statusSpinner.classList.add('hidden');
           elements.statusText.innerText = 'Analysis partial. Required profile/post metrics are missing.';
         }
+
       } catch (err) {
-        console.error('Final compile crash:', err);
+        console.warn('API error encountered:', err.message);
+        
+        // Hide spinner and display clean, descriptive API error state
         elements.statusSpinner.classList.add('hidden');
-        elements.statusText.innerText = 'Analysis compilation failed.';
+        elements.statusText.innerHTML = `
+          <div class="text-rose-500 font-semibold flex flex-col items-center gap-3 py-6">
+            <i class="fa-solid fa-circle-exclamation text-3xl animate-bounce"></i>
+            <span class="text-base text-center max-w-md">API Key Error: ${err.message}</span>
+            <span class="text-xs text-text-muted font-normal text-center max-w-sm mt-1">
+              Please check your RapidAPI subscription or replace the key in the code (Line 353).
+            </span>
+          </div>
+        `;
+        
+        // Hide results container if previously shown
+        elements.resultsDiv.classList.add('hidden');
+        showNotification('⚠️ ' + err.message);
       }
     }
 
     // GENERIC FETCH HELPER
-    async function fetchInstagram(endpoint, username) {
+    async function fetchInstagram(endpoint, params) {
       if (!STATE.rapidApiKey) {
         throw new Error('RapidAPI Key is missing.');
       }
+      const queryParams = new URLSearchParams(params).toString();
       const res = await fetch(
-        `https://instagram-data19.p.rapidapi.com/${endpoint}/?username_or_id_or_url=${username}`,
+        `https://instagram-best-experience.p.rapidapi.com/${endpoint}?${queryParams}`,
         {
           headers: {
             'x-rapidapi-key': STATE.rapidApiKey,
-            'x-rapidapi-host': 'instagram-data19.p.rapidapi.com',
+            'x-rapidapi-host': 'instagram-best-experience.p.rapidapi.com',
             'Content-Type': 'application/json'
           }
         }
@@ -712,6 +660,8 @@
           const errData = await res.json();
           if (errData && errData.message) {
             errorMsg = errData.message;
+          } else if (errData && errData.error) {
+            errorMsg = errData.error;
           }
         } catch (_) {}
         throw new Error(errorMsg);
