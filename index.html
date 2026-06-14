@@ -560,9 +560,15 @@
       // Check if critical fetches failed (e.g., due to RapidAPI 429 Rate Limit or network errors)
       const hasCriticalFailed = profileRes.status === 'rejected' || postsRes.status === 'rejected';
       if (hasCriticalFailed) {
-        console.warn('API critical error encountered. Falling back to simulation mode for @' + username);
-        loadSimulationDashboard(username);
-        showNotification('⚠️ RapidAPI limit reached (429). Loaded simulated dashboard for @' + username);
+        let apiErrorMsg = 'RapidAPI limit reached (429) or endpoint not responding.';
+        if (profileRes.status === 'rejected' && profileRes.reason?.message) {
+          apiErrorMsg = profileRes.reason.message;
+        } else if (postsRes.status === 'rejected' && postsRes.reason?.message) {
+          apiErrorMsg = postsRes.reason.message;
+        }
+        console.warn('API critical error encountered. Falling back to simulation mode for @' + username, apiErrorMsg);
+        loadSimulationDashboard(username, apiErrorMsg);
+        showNotification('⚠️ ' + apiErrorMsg);
         return;
       }
 
@@ -674,7 +680,7 @@
     // GENERIC FETCH HELPER
     async function fetchInstagram(endpoint, username) {
       if (!STATE.rapidApiKey) {
-        throw new Error('RapidAPI Key is missing. Add it in settings.');
+        throw new Error('RapidAPI Key is missing.');
       }
       const res = await fetch(
         `https://instagram-data19.p.rapidapi.com/${endpoint}/?username_or_id_or_url=${username}`,
@@ -686,7 +692,16 @@
           }
         }
       );
-      if (!res.ok) throw new Error(`${endpoint} failed: ${res.status}`);
+      if (!res.ok) {
+        let errorMsg = `${endpoint} failed: ${res.status}`;
+        try {
+          const errData = await res.json();
+          if (errData && errData.message) {
+            errorMsg = errData.message;
+          }
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
       return res.json();
     }
 
@@ -1778,7 +1793,7 @@ Generated via InstaPulse Dashboard.
     });
 
     // SIMULATED DASHBOARD LOADER
-    function loadSimulationDashboard(username) {
+    function loadSimulationDashboard(username, errorMsg = '') {
       STATE.currentUsername = username;
       STATE.isDemoMode = true;
       elements.reportHandle.innerText = `@${username}`;
@@ -1995,6 +2010,12 @@ Generated via InstaPulse Dashboard.
       const banner = document.getElementById('rate-limit-banner');
       if (banner) {
         if (username !== 'design_maven') {
+          banner.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation text-base"></i>
+            <div class="flex-grow">
+              <span>Notice: Showing simulated data because the RapidAPI key failed: <strong class="underline">${errorMsg || 'Quota Exceeded (429)'}</strong>. Please update the API key in the source code to get real live data.</span>
+            </div>
+          `;
           banner.classList.remove('hidden');
         } else {
           banner.classList.add('hidden');
